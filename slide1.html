@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>기술은 안전한데, 우리는 왜 수돗물을 마시지 않을까?</title>
+  <meta name="description" content="한·일 수돗물 인식 비교를 통해 본 묘한 거부감의 원인 — 웹 프레젠테이션 표지" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #050505;
+      --white:    #F5F5F5;
+      --muted:    #A7A7A7;
+      --accent:   #48D7E8;
+      --accent-dim: rgba(72, 215, 232, 0.15);
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Pretendard Variable', 'SUIT', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* ── Full-screen slide wrapper ───────────────── */
+    #slide {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: clamp(48px, 7vw, 120px);
+      position: relative;
+    }
+
+    /* ── Hint overlay (visible before spacebar) ──── */
+    #hint {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
+    }
+    #hint .pulse {
+      width: 48px; height: 48px;
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      animation: pulseBorder 2s ease-in-out infinite;
+    }
+    #hint .pulse svg { opacity: 0.5; }
+    #hint p {
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      font-weight: 300;
+    }
+    @keyframes pulseBorder {
+      0%, 100% { border-color: rgba(255,255,255,0.10); }
+      50%       { border-color: rgba(72, 215, 232, 0.45); }
+    }
+
+    /* ── Content block (hidden until spacebar) ────── */
+    #content {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.55s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.55s cubic-bezier(0.4,0,0.2,1);
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    #content.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Tag line above title */
+    .tag {
+      font-size: clamp(11px, 1.1vw, 14px);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 400;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tag::before {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.7;
+    }
+
+    /* Main title */
+    h1 {
+      font-size: clamp(36px, 5.2vw, 72px);
+      font-weight: 900;
+      line-height: 1.18;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      word-break: keep-all;
+      margin-bottom: 20px;
+    }
+    h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    /* Divider */
+    .divider {
+      width: 48px;
+      height: 1.5px;
+      background: rgba(255,255,255,0.15);
+      margin: 28px 0;
+    }
+
+    /* Subtitle */
+    .subtitle {
+      font-size: clamp(14px, 1.6vw, 19px);
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+      word-break: keep-all;
+      margin-bottom: 48px;
+    }
+
+    /* Team members */
+    .team-label {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 14px;
+      font-weight: 400;
+    }
+    .team-names {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+    }
+    .name-item {
+      font-size: clamp(13px, 1.4vw, 16px);
+      font-weight: 400;
+      color: rgba(245,245,245,0.65);
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .name-item:not(:last-child)::after {
+      content: '·';
+      margin: 0 10px;
+      color: rgba(255,255,255,0.2);
+    }
+
+    /* ── Decorative vertical accent line ─────────── */
+    #accent-line {
+      position: absolute;
+      left: clamp(36px, 5vw, 80px);
+      top: 50%;
+      transform: translateY(-50%) scaleY(0);
+      transform-origin: top center;
+      width: 1.5px;
+      height: clamp(100px, 18vh, 200px);
+      background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+      opacity: 0;
+      transition: transform 0.7s cubic-bezier(0.4,0,0.2,1) 0.15s,
+                  opacity 0.7s ease 0.15s;
+    }
+    #accent-line.visible {
+      transform: translateY(-50%) scaleY(1);
+      opacity: 0.6;
+    }
+
+    /* ── Slide number ─────────────────────────────── */
+    #slide-number {
+      position: absolute;
+      bottom: clamp(24px, 3.5vh, 48px);
+      right: clamp(36px, 4vw, 64px);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      color: rgba(255,255,255,0.2);
+      font-weight: 300;
+      opacity: 0;
+      transition: opacity 0.5s ease 0.4s;
+    }
+    #slide-number.visible { opacity: 1; }
+
+    /* ── Reduced-motion support ───────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      #content, #accent-line, #slide-number, #hint {
+        transition: opacity 0.1s linear !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<section id="slide" aria-label="표지 슬라이드">
+
+  <!-- Hint before interaction -->
+  <div id="hint" aria-hidden="true">
+    <div class="pulse">
+      <!-- spacebar icon -->
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="10" width="16" height="2" rx="1" fill="white"/>
+        <rect x="7" y="13" width="10" height="2" rx="1" fill="white" opacity="0.5"/>
+      </svg>
+    </div>
+    <p>Space to begin</p>
+  </div>
+
+  <!-- Vertical accent line -->
+  <div id="accent-line" aria-hidden="true"></div>
+
+  <!-- Main content -->
+  <div id="content" aria-live="polite">
+    <p class="tag">발표자료 &nbsp;01 / 13</p>
+
+    <h1>
+      기술은 안전한데,<br />
+      우리는 왜<br />
+      수돗물을 <em>마시지 않을까?</em>
+    </h1>
+
+    <div class="divider" aria-hidden="true"></div>
+
+    <p class="subtitle">
+      한·일 수돗물 인식 비교를 통해 본<br />
+      '묘한 거부감'의 원인
+    </p>
+
+    <p class="team-label">발표자</p>
+    <div class="team-names" role="list">
+      <span class="name-item" role="listitem">성민재</span>
+      <span class="name-item" role="listitem">김의현</span>
+      <span class="name-item" role="listitem">문효은</span>
+      <span class="name-item" role="listitem">배승훈</span>
+      <span class="name-item" role="listitem">홍세연</span>
+    </div>
+  </div>
+
+  <!-- Slide number -->
+  <div id="slide-number" aria-hidden="true">01 / 13</div>
+
+</section>
+
+<script>
+  const content     = document.getElementById('content');
+  const accentLine  = document.getElementById('accent-line');
+  const hint        = document.getElementById('hint');
+  const slideNumber = document.getElementById('slide-number');
+
+  let revealed = false;
+
+  function reveal() {
+    if (revealed) return;
+    revealed = true;
+
+    // Hide hint
+    hint.style.opacity = '0';
+    setTimeout(() => { hint.style.display = 'none'; }, 600);
+
+    // Show elements
+    content.classList.add('visible');
+    accentLine.classList.add('visible');
+    slideNumber.classList.add('visible');
+  }
+
+  // Spacebar
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' || e.key === ' ') {
+      e.preventDefault();
+      reveal();
+    }
+  });
+
+  // Click / tap (mobile)
+  document.addEventListener('click', reveal);
+  document.addEventListener('touchend', reveal, { passive: true });
+</script>
+
+</body>
+</html>
